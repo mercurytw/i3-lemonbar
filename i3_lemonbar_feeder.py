@@ -24,20 +24,20 @@ class LemonBar(object):
 		wsp_items = ''
 		for wsp in self.i3.get_workspaces():
 			wsp_name = wsp['name']
-			wsp_action = "%%{A:i3-msg workspace %s}" % wsp_name
+			wsp_action = ""
 			if wsp['output'] != display and not wsp['urgent']:
 				continue
 			if wsp['focused']:
 				# Possibly add dark red tint if urgent
-				wsp_items += "%%{F%s B%s}%s%s%%{F%s B%s T1} %s %%{F%s B%s}%s%%{A}" % (color_head,
+				wsp_items += "%%{F%s B%s}%s%s%%{F%s B%s T1} %s %%{F%s B%s}%s" % (color_head,
 					color_wsp, sep_right, wsp_action, color_back, color_wsp, wsp_name,
 					color_wsp, color_head, sep_right)
 			elif wsp['urgent']:
-				wsp_items += "%%{F%s B%s}%s%s%%{F%s B%s T1} %s %%{F%s B%s}%s%%{A}" % (color_head,
+				wsp_items += "%%{F%s B%s}%s%s%%{F%s B%s T1} %s %%{F%s B%s}%s" % (color_head,
 					color_mail, sep_right, wsp_action, color_back, color_mail, wsp_name,
 					color_mail, color_head, sep_right)	
 			else:
-				wsp_items += "%s%%{F%s T1} %s%%{A} " % (wsp_action, color_disable, wsp_name)
+				wsp_items += "%s%%{F%s T1} %s " % (wsp_action, color_disable, wsp_name)
 		return '%s%s' % (wsp_icon, wsp_items)
 
 	def render_focused_title(self):
