@@ -6,7 +6,7 @@ import time
 import i3ipc
 from signal import SIGTERM
 from threading import Thread
-from subprocess import Popen, PIPE, check_output
+from subprocess import Popen, PIPE, check_output, TimeoutExpired
 from i3_lemonbar_conf import *
 
 class LemonBar(object):
@@ -45,6 +45,20 @@ class LemonBar(object):
 			color_sec_b2, sep_right, color_head, color_sec_b2, icon_prog, color_sec_b2,
 			sep_right, self.focusedWinTitle)
 
+	def render_music(self):
+		song = "fail"
+		try:
+			p = Popen(["/home/jeff/bin/media_dispatch.py", "current"], stdout=PIPE)
+			try:
+				song = p.communicate(timeout=5)[0].decode('utf-8').strip()
+			except TimeoutExpired:
+				p.kill()
+		except:
+			pass
+		cmusik = "%%{F%s }%s%%{F%s B%s} %%{T2}%s%%{F- T1} %s" % (color_sec_b1, sep_left,
+        	color_icon, color_sec_b1, icon_music, song)
+		return cmusik
+
 	def render_datetime(self):
 		cdate = "%%{F%s}%s%%{F%s B%s} %%{T2}%s%%{F- T1} %s" % (color_sec_b1, sep_left,
 			color_icon, color_sec_b1, icon_clock, time.strftime("%d.%m.%Y"))
@@ -56,9 +70,10 @@ class LemonBar(object):
 		# Render one bar per each output
 		out = ''
 		for idx,output in enumerate([ out.name for out in self.i3.get_outputs() if out['active'] ]):
-			out += "%%{S%d}%%{l}%s%s%%{r}%s" % (idx,
+			out += "%%{S%d}%%{l}%s%s%%{r}%s%s" % (idx,
 				self.render_workspaces(display=output),
 				self.render_focused_title(),
+				self.render_music(),
 				self.render_datetime()
 			)
 		print(out)
